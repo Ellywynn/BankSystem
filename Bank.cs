@@ -7,15 +7,17 @@ namespace BankSystem
 	public class Bank
 	{
 		static int numberOfAccounts = 0;
-		decimal balance;
+		static decimal balance;
 
 		List<BankAccount> accounts = new List<BankAccount>();
 
 		public static int NumberOfAccounts { get; }
 		public static decimal Balance { get; }
+		public string Name { get; set; }
 
-		public Bank(decimal initialBalance)
+		public Bank(string name, decimal initialBalance)
 		{
+			Name = name;
 			balance = initialBalance;
 		}
 
@@ -24,17 +26,24 @@ namespace BankSystem
 			accounts.Add(new BankAccount(name, surname, age));
 		}
 
-		public void TakeLoan(decimal amount)
+		public static void TakeLoan(decimal amount)
 		{
-			if(balance < amount)
+			try
 			{
-				throw new ArgumentOutOfRangeException(nameof(amount), "Too much amount to borrow.");
+				if (balance < amount)
+				{
+					throw new ArgumentOutOfRangeException(nameof(amount), "Too much amount to borrow.");
+				}
+				if (balance <= 0)
+				{
+					throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive number.");
+				}
 			}
-			if(balance <= 0)
+			catch(Exception e)
 			{
-				throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive number.");
+				Console.WriteLine(e.Message);
 			}
-		
+
 			balance -= amount;
 		}
 	}

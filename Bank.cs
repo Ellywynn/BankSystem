@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace BankSystem
 {
 	public class Bank
 	{
+		public enum Operation
+		{
+			PutMoney,
+			GetMoney,
+			Deposite,
+			Credit
+		}
+
 		static int numberOfAccounts = 0;
-		static decimal balance;
+		decimal balance;
 
 		List<BankAccount> accounts = new List<BankAccount>();
 
@@ -15,36 +23,18 @@ namespace BankSystem
 		public static decimal Balance { get; }
 		public string Name { get; set; }
 
+		public string HistoryFileName { get; }
+
 		public Bank(string name, decimal initialBalance)
 		{
 			Name = name;
 			balance = initialBalance;
+			HistoryFileName = $@"{Directory.GetCurrentDirectory()}/history/bank_{name}_history.txt";
 		}
 
-		public void CreateAccount(string name, string surname, int age)
+		public void CreateAccount(string name, string surname)
 		{
-			accounts.Add(new BankAccount(name, surname, age));
-		}
-
-		public static void TakeLoan(decimal amount)
-		{
-			try
-			{
-				if (balance < amount)
-				{
-					throw new ArgumentOutOfRangeException(nameof(amount), "Too much amount to borrow.");
-				}
-				if (balance <= 0)
-				{
-					throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive number.");
-				}
-			}
-			catch(Exception e)
-			{
-				Console.WriteLine(e.Message);
-			}
-
-			balance -= amount;
+			accounts.Add(new BankAccount(name, surname, Name));
 		}
 	}
 }

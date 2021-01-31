@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace BankSystem
 {
@@ -6,7 +7,9 @@ namespace BankSystem
 	{
 		static void Main(string[] args)
 		{
-			
+			Bank bank = new Bank("Tinkoff", 1000000);
+			bank.CreateAccount("Ivan", "Ivanov");
+			Console.ReadKey();
 		}
 	}
 }

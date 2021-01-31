@@ -3,67 +3,72 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
+// действия аккаунта:
+// положить деньги, вывести(взять) деньги, взять кредит, выплатить кредит  
+
 namespace BankSystem
 {
 	public class BankAccount
 	{
 		decimal balance;
+		decimal deposite;
 		Person person;
 		string number;
-		List<Transaction> allTransactions = new List<Transaction>();
+		string bankName;
+		string historyFilePath;
 
 		public decimal Balance { get; }
 		public decimal Number { get; }
 		public Person Owner { get; }
 
-		public BankAccount(string name, string surname, int age)
+		public BankAccount(string name, string surname, string bankName)
 		{
-			person = new Person(name, surname, age);
+			person = new Person(name, surname);
 			number = Convert.ToString(Bank.NumberOfAccounts + 1);
+			this.bankName = bankName;
+			historyFilePath = $@"{Directory.GetCurrentDirectory()}/history/{bankName}_{number}_history.txt";
 			balance = 0m;
+			deposite = 0m;
 		}
 
-		public void TakeLoan(decimal amount, string note)
+		public string GetInfo()
 		{
-			Bank.TakeLoan(amount);
-			allTransactions.Add(new Transaction(amount, DateTime.Now, note));
+			string info = $"Account #{number}: {person.Name} {person.Surname}; " +
+				$"Balance: ${balance}; Bank: {bankName}";
+			return info;
+		}
 
-			string dir_name = Directory.GetCurrentDirectory();
-			string file_name = $"{person.Name}_{person.Surname}.log";
-
-			using (StreamWriter file =
-			new StreamWriter($"{dir_name}\\{file_name}.log", true))
+		public void PutMoney(decimal amount, string note)
+		{
+			if(amount <= 0)
 			{
-				file.WriteLine();
+				throw new ArgumentOutOfRangeException(nameof(amount), "Amount of money to put must be positive.");
+			}
+
+			Console.WriteLine("HELLO!");
+			balance += amount;
+			Transaction tr = new Transaction(amount, DateTime.Now, Bank.Operation.PutMoney, note);
+
+			using StreamWriter sw = new StreamWriter(historyFilePath, true);
+				sw.WriteLine(tr.Info());
+		}
+
+		public void Deposite(decimal amount)
+		{
+			if (amount <= 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(amount), "Amount of money to deposite must be positive.");
 			}
 		}
 
-		public void GetInfo()
+		private void SaveAccountTransaction(Transaction transaction, Bank.Operation operation)
 		{
-			string output = $"Account #{number}: {person.Name} {person.Surname}; age: {person.Age}; " +
-				$"Balance: ${balance}";
-			Console.WriteLine(output);
+
 		}
 
-		public List<string> GetTransactionHistory()
+		private void SaveBankTransaction(Transaction transaction, Bank.Operation operation)
 		{
-			List<string> transactions = new List<string>();
 
-			foreach (var item in allTransactions)
-			{
-				transactions.Add($"#{item.Number}\t\t{item.Date}\t\t{item.Note}");
-			}
-
-			return transactions;
-		}
-
-		public void SaveHistoryInfoFile()
-		{
-			string dir_name = Directory.GetCurrentDirectory();
-			string file_name = $"{person.Name}_{person.Surname}.log";
-
-			File.WriteAllLines(dir_name + @"/" + file_name,
-				GetTransactionHistory().ToArray());
 		}
 	}
 }

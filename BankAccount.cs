@@ -26,7 +26,7 @@ namespace BankSystem
 			person = new Person(name, surname);
 			number = Convert.ToString(Bank.NumberOfAccounts + 1);
 			this.bankName = bankName;
-			historyFilePath = $@"{Directory.GetCurrentDirectory()}/history/{bankName}_{number}_history.txt";
+			historyFilePath = $@"{Directory.GetCurrentDirectory()}/history/{bankName}_{name}_{surname}.txt";
 			balance = 0m;
 			deposite = 0m;
 		}
@@ -38,19 +38,22 @@ namespace BankSystem
 			return info;
 		}
 
-		public void PutMoney(decimal amount, string note)
+		public void PutMoney(decimal amount, string note = "")
 		{
-			if(amount <= 0)
+			try
 			{
-				throw new ArgumentOutOfRangeException(nameof(amount), "Amount of money to put must be positive.");
+				if (amount <= 0)
+				{
+					throw new ArgumentOutOfRangeException(nameof(amount), "Amount of money to put must be positive.");
+				}
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine(e.Message);
 			}
 
-			Console.WriteLine("HELLO!");
 			balance += amount;
-			Transaction tr = new Transaction(amount, DateTime.Now, Bank.Operation.PutMoney, note);
-
-			using StreamWriter sw = new StreamWriter(historyFilePath, true);
-				sw.WriteLine(tr.Info());
+			SaveAccountTransaction(new Transaction(amount, DateTime.Now, Bank.Operation.PutMoney, note));
 		}
 
 		public void Deposite(decimal amount)
@@ -61,12 +64,22 @@ namespace BankSystem
 			}
 		}
 
-		private void SaveAccountTransaction(Transaction transaction, Bank.Operation operation)
+		private void SaveAccountTransaction(Transaction transaction)
 		{
+			string fileDir = $@"{Directory.GetCurrentDirectory()}/history";
+			if (!Directory.Exists(fileDir))
+			{
+				Directory.CreateDirectory(fileDir);
+			}
+			if(!File.Exists(historyFilePath))
+			{
+				File.WriteAllText(historyFilePath, "ID:\t\tDate:\t\t\tOperation type:\t\tAmount:\t\tNote:\n\n");
+			}
 
+			File.AppendAllText(historyFilePath, transaction.InfoTable());
 		}
 
-		private void SaveBankTransaction(Transaction transaction, Bank.Operation operation)
+		private void SaveBankTransaction(Transaction transaction)
 		{
 
 		}

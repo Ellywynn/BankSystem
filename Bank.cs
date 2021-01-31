@@ -32,9 +32,12 @@ namespace BankSystem
 			HistoryFileName = $@"{Directory.GetCurrentDirectory()}/history/bank_{name}_history.txt";
 		}
 
-		public void CreateAccount(string name, string surname)
+		public BankAccount CreateAccount(string name, string surname)
 		{
-			accounts.Add(new BankAccount(name, surname, Name));
+			BankAccount account = new BankAccount(name, surname, Name);
+			accounts.Add(account);
+
+			return account;
 		}
 	}
 }

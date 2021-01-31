@@ -8,7 +8,8 @@ namespace BankSystem
 		static void Main(string[] args)
 		{
 			Bank bank = new Bank("Tinkoff", 1000000);
-			bank.CreateAccount("Ivan", "Ivanov");
+			var a1 = bank.CreateAccount("Ivan", "Ivanov");
+			a1.PutMoney(413241234, "TEST!");
 			Console.ReadKey();
 		}
 	}

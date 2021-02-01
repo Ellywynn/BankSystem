@@ -29,6 +29,8 @@ namespace BankSystem
 			historyFilePath = $@"{Directory.GetCurrentDirectory()}/history/{bankName}_{name}_{surname}.txt";
 			balance = 0m;
 			deposite = 0m;
+
+
 		}
 
 		public string GetInfo()
@@ -67,6 +69,7 @@ namespace BankSystem
 		private void SaveAccountTransaction(Transaction transaction)
 		{
 			string fileDir = $@"{Directory.GetCurrentDirectory()}/history";
+
 			if (!Directory.Exists(fileDir))
 			{
 				Directory.CreateDirectory(fileDir);

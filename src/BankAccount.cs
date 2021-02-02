@@ -18,7 +18,7 @@ namespace BankSystem
 		string historyFilePath;
 
 		public decimal Balance { get; }
-		public decimal Number { get; }
+		public string Number { get => number; }
 		public Person Owner { get; }
 
 		public BankAccount(string name, string surname, string bankName)

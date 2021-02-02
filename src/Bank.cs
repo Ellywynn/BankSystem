@@ -14,8 +14,11 @@ namespace BankSystem
 			Credit
 		}
 
-		static int numberOfAccounts = 0;
-		decimal balance = 0;
+		private static int numberOfAccounts = 0;
+		private decimal balance = 0;
+
+		private string bankInfoFilePath;
+		private string bankAccountsFilePath;
 
 		List<BankAccount> accounts = new List<BankAccount>();
 
@@ -24,27 +27,30 @@ namespace BankSystem
 		public string Name { get; set; }
 
 		public string HistoryFileName { get; }
-
+		
 		public Bank(string name, decimal initialBalance)
 		{
 			Name = name;
 			balance = initialBalance;
-			HistoryFileName = $@"{Directory.GetCurrentDirectory()}/history/bank_{name}_history.txt";
-			InitBankFromFile();
+			string dir = Directory.GetCurrentDirectory();
+
+			HistoryFileName = $@"{dir}/history/banks/{name}_history.txt";
+			bankInfoFilePath = $@"{dir}/banks/{Name}/bank_{Name}.txt";
+			bankAccountsFilePath = $@"{dir}/banks/{Name}accounts.txt";
+
+			InitBank();
+			LoadBankAccounts();
 		}
 
 		// destructor for saving bank info
 		~Bank()
-		{
-			string dir = $@"{Directory.GetCurrentDirectory()}/banks";
-			string filePath = dir + @$"/bank_{Name}.txt";
-
+		{ 
 			// write baml characteristics into the file
 			string str =
 				"Number of accounts: " + 0 + '\n' +
 				"Balance: " + Balance + '\n';
 
-			File.WriteAllText(filePath, str);
+			File.WriteAllText(bankInfoFilePath, str);
 		}
 
 		// creates bank account
@@ -58,11 +64,10 @@ namespace BankSystem
 		}
 
 		// load bank info from file
-		private void InitBankFromFile()
+		private void InitBank()
 		{
 			// check to null strings
-			string dir = $@"{Directory.GetCurrentDirectory()}/banks";
-			string filePath = dir + @$"/bank_{Name}.txt";
+			string dir = $@"{Directory.GetCurrentDirectory()}/banks/{Name}";
 
 			// if dir for bank info doesn't exist, create it
 			if (!Directory.Exists(dir))
@@ -71,27 +76,25 @@ namespace BankSystem
 			}
 
 			// if file info doesn't exist, create it and save
-			if (!File.Exists(filePath))
+			if (!File.Exists(bankInfoFilePath))
 			{
-				File.Create(filePath);
+				File.Create(bankInfoFilePath);
 
-				SaveBankInfo(filePath);
+				SaveBankInfo();
 				return;
 			}
 
 			// if file does exists(bank already created), load info
-			LoadBankInfo(filePath);
+			LoadBankInfo();
 		}
 
 		private void SaveNewAccount(BankAccount account)
 		{
-			string filePath = $@"{Directory.GetCurrentDirectory()}/account.txt";
-
 			// if file does not exist, create it and write tablet columns
-			if (!File.Exists(filePath))
+			if (!File.Exists(bankAccountsFilePath))
 			{
-				File.Create(filePath);
-				File.WriteAllText(filePath, "Account number:\tPerson:\t\tBalance:\tBank:\n");
+				File.Create(bankAccountsFilePath);
+				File.WriteAllText(bankAccountsFilePath, "Account number:\tPerson:\t\tBalance:\tBank:\n");
 			}
 
 			// write account info(id/name surname/balance/bank name)
@@ -101,29 +104,56 @@ namespace BankSystem
 				$"{String.Format("{0:000000000000}", account.Balance)}\t" +
 				$"{Name}\n";
 
-			File.WriteAllText(filePath, str);
+			File.WriteAllText(bankAccountsFilePath, str);
 		}
 
-		private void LoadBankInfo(string filePath)
+		private void LoadBankInfo()
 		{
-			string[] lines = File.ReadAllLines(filePath);
+			string[] lines = File.ReadAllLines(bankInfoFilePath);
 
-			numberOfAccounts = int.Parse(lines[0]);
-			balance = decimal.Parse(lines[1]);
+			if (lines.Length > 0)
+			{
+				numberOfAccounts = int.Parse(lines[0]);
+				balance = decimal.Parse(lines[1]);
+			}
+			else
+			{
+				Console.WriteLine($"File {bankInfoFilePath} is empty.");
+			}
 		}
 
-		private void SaveBankInfo(string filePath)
+		private void SaveBankInfo()
 		{
 			string[] str = { 
 				$"Number of accounts: {numberOfAccounts}",
 				$"Balance: {balance}"
 			};
-			File.WriteAllLines(filePath, str);
+			File.WriteAllLines(bankInfoFilePath, str);
 		}
 
 		private void SaveBankAccounts()
 		{
-			string path = $@"";
+			
+		}
+
+		private void LoadBankAccounts()
+		{
+			string[] lines = File.ReadAllLines(bankAccountsFilePath);
+
+			for(int i = 1; i < lines.Length; i++)
+			{
+				string[] str = lines[i].Split(' ', 5);
+
+				string num = str[0];
+				string name = str[1];
+				string surname = str[2];
+				decimal bal = decimal.Parse(str[3]);
+				string bankname = str[4];
+
+				Console.WriteLine($"STR = {str}");
+
+				//accounts.Add(lines[i]);
+			}
 		}
 	}
 }

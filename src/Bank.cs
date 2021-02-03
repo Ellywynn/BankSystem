@@ -39,7 +39,7 @@ namespace BankSystem
 			bankAccountsFilePath = $@"{dir}/banks/{Name}accounts.txt";
 
 			InitBank();
-			LoadBankAccounts();
+			//LoadBankAccounts();
 		}
 
 		// destructor for saving bank info
@@ -50,7 +50,10 @@ namespace BankSystem
 				"Number of accounts: " + 0 + '\n' +
 				"Balance: " + Balance + '\n';
 
-			File.WriteAllText(bankInfoFilePath, str);
+			using (StreamWriter sw = new StreamWriter(bankAccountsFilePath, true))
+			{
+				sw.Write(str);
+			}
 		}
 
 		// creates bank account
@@ -78,7 +81,7 @@ namespace BankSystem
 			// if file info doesn't exist, create it and save
 			if (!File.Exists(bankInfoFilePath))
 			{
-				File.Create(bankInfoFilePath);
+				using (File.Create(bankInfoFilePath)) ;
 
 				SaveBankInfo();
 				return;
@@ -93,25 +96,42 @@ namespace BankSystem
 			// if file does not exist, create it and write tablet columns
 			if (!File.Exists(bankAccountsFilePath))
 			{
-				File.Create(bankAccountsFilePath);
-				File.WriteAllText(bankAccountsFilePath, "Account number:\tPerson:\t\tBalance:\tBank:\n");
+				using (File.Create(bankAccountsFilePath)) ;
+
+				using(StreamWriter sw = new StreamWriter(bankAccountsFilePath, true))
+				{
+					sw.Write("Account number:\tPerson:\t\tBalance:\tBank:\n");
+				}
 			}
 
 			// write account info(id/name surname/balance/bank name)
-			string str =
-				$"{String.Format("{0:000000}",account.Number)}\t" +
+			string str = 
+				$"{String.Format("{0:000000}", account.Number)}\t" +
 				$"{account.Owner.Name} {account.Owner.Surname}\t" +
 				$"{String.Format("{0:000000000000}", account.Balance)}\t" +
 				$"{Name}\n";
 
-			File.WriteAllText(bankAccountsFilePath, str);
+			using (StreamWriter sw = new StreamWriter(bankAccountsFilePath, true))
+			{
+				sw.Write(str);
+			}
 		}
 
 		private void LoadBankInfo()
 		{
-			string[] lines = File.ReadAllLines(bankInfoFilePath);
+			List<string> lines = new List<string>();
+			string line = "";
 
-			if (lines.Length > 0)
+			// read all lines from file
+			using(StreamReader sr = new StreamReader(bankInfoFilePath))
+			{
+				while((line = sr.ReadLine()) != null)
+				{
+					lines.Add(line.Split(": ")[1]);
+				}
+			}
+
+			if (lines.Count > 0)
 			{
 				numberOfAccounts = int.Parse(lines[0]);
 				balance = decimal.Parse(lines[1]);
@@ -128,7 +148,13 @@ namespace BankSystem
 				$"Number of accounts: {numberOfAccounts}",
 				$"Balance: {balance}"
 			};
-			File.WriteAllLines(bankInfoFilePath, str);
+			using(StreamWriter sw = new StreamWriter(bankInfoFilePath, false))
+			{
+				foreach (string item in str)
+				{
+					sw.WriteLine(item);
+				}
+			}
 		}
 
 		private void SaveBankAccounts()
@@ -138,9 +164,19 @@ namespace BankSystem
 
 		private void LoadBankAccounts()
 		{
-			string[] lines = File.ReadAllLines(bankAccountsFilePath);
+			List<string> lines = new List<string>();
+			string line = "";
 
-			for(int i = 1; i < lines.Length; i++)
+			// read all lines from file
+			using (StreamReader sr = new StreamReader(bankAccountsFilePath))
+			{
+				while ((line = sr.ReadLine()) != null)
+				{
+					lines.Add(line);
+				}
+			}
+
+			for (int i = 1; i < lines.Count; i++)
 			{
 				string[] str = lines[i].Split(' ', 5);
 

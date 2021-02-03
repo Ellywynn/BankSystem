@@ -19,18 +19,17 @@ namespace BankSystem
 
 		public decimal Balance { get; }
 		public string Number { get => number; }
-		public Person Owner { get; }
+		public Person Owner { get => person; }
 
 		public BankAccount(string name, string surname, string bankName)
 		{
 			person = new Person(name, surname);
 			number = Convert.ToString(Bank.NumberOfAccounts + 1);
+
 			this.bankName = bankName;
 			historyFilePath = $@"{Directory.GetCurrentDirectory()}/history/{bankName}_{name}_{surname}.txt";
 			balance = 0m;
 			deposite = 0m;
-
-
 		}
 
 		public string GetInfo()
@@ -79,7 +78,10 @@ namespace BankSystem
 				File.WriteAllText(historyFilePath, "ID:\t\tDate:\t\t\tOperation type:\t\tAmount:\t\tNote:\n\n");
 			}
 
-			File.AppendAllText(historyFilePath, transaction.InfoTable());
+			using (StreamWriter sw = new StreamWriter(historyFilePath, true, Encoding.UTF8))
+			{
+				sw.WriteLine(transaction.InfoTable());
+			}
 		}
 
 		private void SaveBankTransaction(Transaction transaction)

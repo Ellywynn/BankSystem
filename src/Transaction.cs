@@ -8,6 +8,14 @@ namespace BankSystem
 		private static long id = 0;
 		private long transactionID;
 		private Bank.Operation operation;
+		public static long Count { 
+			get => id;
+			set
+			{
+				if (value > 0)
+					id = value;
+			}
+		}
 		public decimal Amount { get; set; }
 		public DateTime Date { get; set; }
 		public string Note { get; set; }

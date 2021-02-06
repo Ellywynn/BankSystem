@@ -20,7 +20,7 @@ namespace BankSystem
 		private string bankInfoFilePath;
 		private string bankAccountsFilePath;
 
-		List<BankAccount> accounts = new List<BankAccount>();
+		private List<BankAccount> accounts = new List<BankAccount>();
 
 		public static int NumberOfAccounts { get; }
 		public static decimal Balance { get; }
@@ -44,16 +44,9 @@ namespace BankSystem
 
 		// destructor for saving bank info
 		~Bank()
-		{ 
-			// write baml characteristics into the file
-			string str =
-				"Number of accounts: " + 0 + '\n' +
-				"Balance: " + Balance + '\n';
-
-			using (StreamWriter sw = new StreamWriter(bankAccountsFilePath, true))
-			{
-				sw.Write(str);
-			}
+		{
+			// write bank characteristics into the file
+			SaveBankInfo();
 		}
 
 		// creates bank account
@@ -106,7 +99,7 @@ namespace BankSystem
 
 			// write account info(id/name surname/balance/bank name)
 			string str = 
-				$"{String.Format("{0:000000}", account.Number)}\t" +
+				$"{String.Format("{0:000000}", int.Parse(account.Number))}\t" +
 				$"{account.Owner.Name} {account.Owner.Surname}\t" +
 				$"{String.Format("{0:000000000000}", account.Balance)}\t" +
 				$"{Name}\n";
@@ -135,6 +128,8 @@ namespace BankSystem
 			{
 				numberOfAccounts = int.Parse(lines[0]);
 				balance = decimal.Parse(lines[1]);
+				Transaction.Count = long.Parse(lines[2]);
+				Console.WriteLine($"Count = {long.Parse(lines[2])}");
 			}
 			else
 			{
@@ -146,8 +141,10 @@ namespace BankSystem
 		{
 			string[] str = { 
 				$"Number of accounts: {numberOfAccounts}",
-				$"Balance: {balance}"
+				$"Balance: {balance}",
+				$"Transactions: {Transaction.Count}"
 			};
+
 			using(StreamWriter sw = new StreamWriter(bankInfoFilePath, false))
 			{
 				foreach (string item in str)
